@@ -1,0 +1,103 @@
+<?php
+class DatabaseConnection{
+    private $host = "localhost";
+    private $user = "root";
+    private $password = "";
+    //edit database on command
+    private $database = "parduotuve";
+
+    protected $conn;
+
+    public function __construct() {
+        try{
+            
+            $this->conn = new PDO("mysql:host=$this->host;dbname=$this->database", $this->user, $this->password);
+            // not fail
+        }
+        catch (PDOException $e){
+            // fail
+        }
+    }
+
+    //pick a table and select all from it
+    public function selectAction($table){
+        try {
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "SELECT * FROM `$table` WHERE 1";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll();
+            return $result;
+        } catch(PDOException $e) {
+            return "Failed: " . $e->getMessage();
+        }
+    }
+
+    public function selectByColAction($table, $col){
+        try {
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "SELECT $col FROM `$table` WHERE 1";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll();
+            return $result;
+        } catch(PDOException $e) {
+            return "Failed: " . $e->getMessage();
+        }
+    }
+
+        //$table1 = "products";
+        //$table2 = "categories";
+
+        //$table1RelationCol = "category_id";
+        //$table2RelationCol = "id";
+
+        //$join = "LEFT JOIN";
+
+        //$cols = ["products.id", "products.title", "products.description", "products.price", "categories.title as Category", products.image_url];
+    public function selectJoinAction($table1, $table2, $table1RelationCol, $table2RelationCol, $join, $cols){
+        $cols = implode(",", $cols);
+
+        try{
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql= "SELECT $cols FROM $table1
+            $join $table2
+            ON $table1.$table1RelationCol = $table2.$table2RelationCol";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll();
+            return $result; 
+        } catch(PDOException $e) {
+            return "Failed " . $e->getMessage();
+        }
+    }
+
+    public function insertAction($table, $cols, $values){
+        //paima table, column, value ir ideda i sql
+        $cols = implode(",", $cols);
+        $values = implode(",", $values);
+
+        try{
+        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        //INSERT INTO `products`([`title`,`description`, `price`, `category_id`]) VALUES ('title','description', 1, 1)
+        $sql = "INSERT INTO `$table` ($cols) VALUES ($values)";
+
+        $this->conn->exec($sql);
+        //return "put " . $values . " into " . $cols . " into table " . $table;
+        } catch (PDOException $e) {
+            echo "failed: " . $e->getMessage(); 
+            //failed
+        }
+        
+    }
+
+    //Destruktoriaus funkcija - pasileidzia automatiskai po objekto sunaikinimo/ ir po objekto metodo ivykdymo
+    public function __destruct() {
+        $this->conn = null;
+       // echo "Atjungta is duomenu bazes sekmingai";
+    }
+}
+?>
