@@ -23,7 +23,7 @@ class parduotuveDatabase extends DatabaseConnection
 
         //var_dump($this->parduotuve[0]);
         //if we are in index, print the whole list plus editing functionality
-        if (isset($_GET["page"]) || isset($_GET["subpage"])) {
+        if ((isset($_GET["page"]) || isset($_GET["subpage"])) && !isset($_POST["delete"]) && !isset($_POST["update"])) {
             if ($_GET["page"] == "products" && $_GET["subpage"] == "index") {
                 foreach ($this->parduotuve as $item) {
                     echo "<tr>";
@@ -36,16 +36,22 @@ class parduotuveDatabase extends DatabaseConnection
                     } else {
                         echo "<td>" . $item["category"] . "</td>";
                     }
-                    echo "<td>" . $item["image_url"] . "</td>";
+                    // <image href="$item["image_url"]" >
+                    if(empty($item["image_url"])){
+                        echo "<td>NO IMAGE</td>";
+                    } else {
+                        $image_url = str_replace("\\", "/", $item['image_url']);
+                        echo "<td><img height='100' width='100' src='products/". $image_url ."'</td>";
+                    }
                     echo "<td>";
                     echo "<form method='POST'>";
                     echo "<input type='hidden' name='id' value='" . $item["id"] . "'>";
                     //code delete action
+                    echo "<a href='index.php?page=products&subpage=update&id=" . $item["id"] . "' class='btn btn-success'>EDIT</a>";
                     echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
                     echo "</form>";
                     //code edit action to go to edit screen (update in sql)
-                    //echo "<a href='index.php?page=update&id='. $movie["id"]. "' class='btn btn-success'>EDIT</a>";
-                    //echo "<a href='index.php?page=update&id=" . $movie["id"] . "' class='btn btn-success'>EDIT</a>";
+                    
                     echo "</td>";
                     echo "</tr>";
                 }
@@ -77,10 +83,38 @@ class parduotuveDatabase extends DatabaseConnection
         //select with join bus cia kad parodytu database
     }
 
-    public function createItem(){
-        if(isset($_POST['submit'])){
-            
+    public function deleteItem($table){
+        if(isset($_POST["delete"])){
+            $this->deleteAction($table, $_POST["id"]);
+            header("Location: index.php?page=products&subpage=index");
         }
+    }
+
+    public function createItem($table){
+        if(isset($_POST['submit'])){
+            //set all text entries
+            
+            //skip id, title, description, price float, category_id provided, image_url
+            $cols = ["title", "description"];
+            $items = [
+                '"' . $_POST['title'] . '"',
+                '"' . $_POST['description']. '"'
+            ];
+            if($table == "products")
+            {
+                array_push($cols, "price", "category_id", "image_url");
+                array_push($items, '"' . $_POST['price'] . '"', $_POST['category_id']);
+                //image url
+                array_push($items, '"files/SkateDog.png"');
+            }
+            // $table = products\
+            // $cols = [`title`, `description`, `price`, `category_id`, `image_url`]
+            // $values = [title, description, 1.0, 1, "uploads/image.png"]
+            if($this->insertAction($table, $cols, $items)){
+                return 1;
+            }
+        }
+        return 0;
     }
 
 
@@ -88,6 +122,32 @@ class parduotuveDatabase extends DatabaseConnection
         $this->categories = $this->selectByColAction($table, $col);
         return $this->categories;
     }
+
+    public function selectOneItem($table) {
+        if(($_GET["subpage"] == "update" && isset($_GET["id"]))) {
+            $item = $this->selectOneAction($table, $_GET["id"]);
+            return $item[0];
+            
+        }
+    }
+
+    public function updateItem($table) {
+        if(isset($_POST["update"])) {
+            $data = array(
+                'title' => $_POST['title'],
+                'description' => $_POST['description']
+            );
+            if($table == 'products'){
+                $data['price'] = $_POST['price'];
+                $data['category_id'] = $_POST['category_id'];
+            }
+
+            $this->updateAction($table, $_POST["id"] , $data);
+            return 1;
+        }
+        return 0;
+    }
+
     public function createRandomItems($amount, $table)
     {
         //jeigu paspaustas mygtukas gal?

@@ -14,7 +14,7 @@
             <th>Actions</th>
         </tr>
         <?php $productsDatabase = new parduotuveDatabase(); ?>
-        <?php //$movies->deleteMovie(); ?>
+        <?php $productsDatabase->deleteItem("products"); ?>
         
     </table>
     <?php

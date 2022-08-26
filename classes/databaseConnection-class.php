@@ -86,12 +86,65 @@ class DatabaseConnection{
         $sql = "INSERT INTO `$table` ($cols) VALUES ($values)";
 
         $this->conn->exec($sql);
+        return 1;
         //return "put " . $values . " into " . $cols . " into table " . $table;
         } catch (PDOException $e) {
             echo "failed: " . $e->getMessage(); 
             //failed
+            return 0;
         }
         
+    }
+
+    public function deleteAction($table, $id){
+        try {
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "DELETE FROM `$table` WHERE id = $id";
+            $this->conn->exec($sql);
+        }
+        catch(PDOException $e) {
+            echo "Failed: " . $e->getMessage();
+        }
+    }
+
+    public function selectOneAction($table, $id) {
+        try {
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = "SELECT * FROM `$table` WHERE id = $id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll();
+            return $result;
+        } catch(PDOException $e) {
+            return "Failed: " . $e->getMessage();
+        }
+    }
+
+    public function updateAction($table, $id, $data) {
+        $cols = array_keys($data);
+        //var_dump($cols);
+        $values = array_values($data);
+        //var_dump($values);
+
+        $dataString = [];
+        for ($i=0; $i<count($cols); $i++) {
+           $dataString[] = $cols[$i] . " = '" . $values[$i]. "'";
+        }
+        $dataString = implode(",", $dataString);
+     var_dump($dataString);
+
+
+       try{
+              $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+              $sql = "UPDATE `$table` SET $dataString WHERE id = $id";
+              $stmt = $this->conn->prepare($sql);
+              $stmt->execute();
+              echo "Pavyko atnaujinti irasa";
+         } 
+       catch(PDOException $e) {
+              echo "Failed: " . $e->getMessage();
+       }
     }
 
     //Destruktoriaus funkcija - pasileidzia automatiskai po objekto sunaikinimo/ ir po objekto metodo ivykdymo
