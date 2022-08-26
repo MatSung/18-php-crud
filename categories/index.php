@@ -10,7 +10,7 @@
             <th>Actions</th>
         </tr>
         <?php $productsDatabase = new parduotuveDatabase("categories"); ?>
-        <?php //$movies->deleteMovie(); ?>
+        <?php $productsDatabase->deleteItem("categories"); ?>
         
     </table>
 </body>

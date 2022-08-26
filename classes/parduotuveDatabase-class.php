@@ -46,8 +46,8 @@ class parduotuveDatabase extends DatabaseConnection
                     echo "<td>";
                     echo "<form method='POST'>";
                     echo "<input type='hidden' name='id' value='" . $item["id"] . "'>";
-                    //code delete action
-                    echo "<a href='index.php?page=products&subpage=update&id=" . $item["id"] . "' class='btn btn-success'>EDIT</a>";
+                    //edit and delete
+                    echo "<a href='index.php?page=products&subpage=update&id=" . $item["id"] . "' class='btn btn-primary'>EDIT</a>";
                     echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
                     echo "</form>";
                     //code edit action to go to edit screen (update in sql)
@@ -65,10 +65,10 @@ class parduotuveDatabase extends DatabaseConnection
                     echo "<form method='POST'>";
                     echo "<input type='hidden' name='id' value='" . $item["id"] . "'>";
                     //code delete action
-                    echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
+                    echo "<a href='index.php?page=categories&subpage=update&id=" . $item["id"] . "' class='btn btn-primary'>EDIT</a>";
+                    echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";                    
                     echo "</form>";
                     //code edit action to go to edit screen (update in sql)
-                    //echo "<a href='index.php?page=update&id='. $movie["id"]. "' class='btn btn-success'>EDIT</a>";
                     //echo "<a href='index.php?page=update&id=" . $movie["id"] . "' class='btn btn-success'>EDIT</a>";
                     echo "</td>";
                     echo "</tr>";
@@ -86,7 +86,7 @@ class parduotuveDatabase extends DatabaseConnection
     public function deleteItem($table){
         if(isset($_POST["delete"])){
             $this->deleteAction($table, $_POST["id"]);
-            header("Location: index.php?page=products&subpage=index");
+            header("Location: index.php?page=".$table."&subpage=index");
         }
     }
 
