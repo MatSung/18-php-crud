@@ -14,15 +14,45 @@ class parduotuveDatabase extends DatabaseConnection
         //jeigu norim kategoriju tada products yra antrinis table
         if ($table1 == 'products') {
             $table2 = 'categories';
-            $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"]);
+            if (isset($_POST['sort_by_cat'])){
+                if ($_POST['sort_type'] == "asc"){
+                    $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category");
+                } else {
+                    $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC");
+                }
+            } else {
+                $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"]);
+            }
         } else {
             $table2 = 'products';
-            $this->parduotuve = $this->selectAction($table1);
+            if (isset($_POST['sort_by_id'])){
+                if ($_POST['sort_type'] == "asc"){
+                    $this->parduotuve = $this->selectAction($table1,"id", 'ASC');
+                } else {
+                    $this->parduotuve = $this->selectAction($table1,"id", 'DESC');
+                }
+            } else if(isset($_POST['sort_by_title'])){
+                if ($_POST['sort_type'] == "asc"){
+                    $this->parduotuve = $this->selectAction($table1,"title", 'ASC');
+                } else {
+                    $this->parduotuve = $this->selectAction($table1,"title", 'DESC');
+                }
+            } else if (isset($_POST['sort_by_desc'])){
+                if ($_POST['sort_type'] == "asc"){
+                    $this->parduotuve = $this->selectAction($table1,"description", 'ASC');
+                } else {
+                    $this->parduotuve = $this->selectAction($table1,"description", 'DESC');
+                }
+            }
+             else {
+                $this->parduotuve = $this->selectAction($table1);
+            }
 
         }
 
         //var_dump($this->parduotuve[0]);
         //if we are in index, print the whole list plus editing functionality
+
         if ((isset($_GET["page"]) || isset($_GET["subpage"])) && !isset($_POST["delete"]) && !isset($_POST["update"])) {
             if ($_GET["page"] == "products" && $_GET["subpage"] == "index") {
                 foreach ($this->parduotuve as $item) {

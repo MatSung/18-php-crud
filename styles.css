@@ -76,3 +76,8 @@ header{
     margin-left: 20px;
     width: 40vw;
   }
+
+  .sort-form{
+    display: inline-block !important;
+    width: 40px !important;
+  }

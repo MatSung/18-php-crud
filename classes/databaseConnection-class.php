@@ -20,10 +20,10 @@ class DatabaseConnection{
     }
 
     //pick a table and select all from it
-    public function selectAction($table){
+    public function selectAction($table,$sortCol="id", $sortDir="ASC"){
         try {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "SELECT * FROM `$table` WHERE 1";
+            $sql = "SELECT * FROM `$table` WHERE 1 ORDER BY $sortCol $sortDir";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -57,18 +57,20 @@ class DatabaseConnection{
         //$join = "LEFT JOIN";
 
         //$cols = ["products.id", "products.title", "products.description", "products.price", "categories.title as Category", products.image_url];
-    public function selectJoinAction($table1, $table2, $table1RelationCol, $table2RelationCol, $join, $cols){
+    public function selectJoinAction($table1, $table2, $table1RelationCol, $table2RelationCol, $join, $cols, $sortCol = "id", $sortDir = "ASC"){
         $cols = implode(",", $cols);
 
         try{
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql= "SELECT $cols FROM $table1
+            $sql= "SELECT $cols FROM $table1 
             $join $table2
-            ON $table1.$table1RelationCol = $table2.$table2RelationCol";
+            ON $table1.$table1RelationCol = $table2.$table2RelationCol
+            ORDER BY $sortCol $sortDir";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $result = $stmt->fetchAll();
+            
             return $result; 
         } catch(PDOException $e) {
             return "Failed " . $e->getMessage();
