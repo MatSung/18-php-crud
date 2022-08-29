@@ -1,6 +1,6 @@
 
 <?php
-$target_dir = "files\\";
+$target_dir = "products/files/";
 $target_file = '';
 $uploadOk = 1;
 $imageFileType = '';
