@@ -139,7 +139,7 @@ class parduotuveDatabase extends DatabaseConnection
                 array_push($cols, "price", "category_id", "image_url");
                 array_push($items, '"' . $_POST['price'] . '"', $_POST['category_id']);
                 //image url
-                array_push($items, '"files/SkateDog.png"');
+                //array_push($items, '"files/SkateDog.png"');
             }
             // $table = products\
             // $cols = [`title`, `description`, `price`, `category_id`, `image_url`]

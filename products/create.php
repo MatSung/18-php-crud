@@ -1,9 +1,9 @@
 <?php
 $parduotuveDatabase = new parduotuveDatabase();
-// include("upload.php");
-if($parduotuveDatabase->createItem('products')){
-    header('Location: index.php?page=products&subpage=index');
-}
+include("upload.php");
+//if($parduotuveDatabase->createItem('products')){
+//    header('Location: index.php?page=products&subpage=index');
+//}
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +33,7 @@ if($parduotuveDatabase->createItem('products')){
             //var_dump($parduotuveDatabase->getValues('categories','id, title'));
             ?>
             <label for="myfile">Select an image:</label>
-            <input type="file" id="myfile" name="myfile" disabled>
+            <input type="file" id="myfile" name="myfile">
             <br />
             <button class="btn btn-primary" type="submit" name="submit">Create</button>
         </form>
