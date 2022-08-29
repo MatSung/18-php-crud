@@ -43,6 +43,7 @@
             <th>Actions</th>
         </tr>
         <?php $productsDatabase = new parduotuveDatabase("categories"); ?>
+        <?php $productsDatabase->getItems(); ?>
         <?php $productsDatabase->deleteItem("categories"); ?>
 
     </table>

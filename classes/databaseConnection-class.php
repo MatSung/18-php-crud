@@ -20,10 +20,10 @@ class DatabaseConnection{
     }
 
     //pick a table and select all from it
-    public function selectAction($table,$sortCol="id", $sortDir="ASC"){
+    public function selectAction($table,$sortCol="id", $sortDir="ASC", $filter = "1"){
         try {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "SELECT * FROM `$table` WHERE 1 ORDER BY $sortCol $sortDir";
+            $sql = "SELECT * FROM `$table` WHERE $filter ORDER BY $sortCol $sortDir";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -57,7 +57,7 @@ class DatabaseConnection{
         //$join = "LEFT JOIN";
 
         //$cols = ["products.id", "products.title", "products.description", "products.price", "categories.title as Category", products.image_url];
-    public function selectJoinAction($table1, $table2, $table1RelationCol, $table2RelationCol, $join, $cols, $sortCol = "id", $sortDir = "ASC"){
+    public function selectJoinAction($table1, $table2, $table1RelationCol, $table2RelationCol, $join, $cols, $sortCol = "id", $sortDir = "ASC", $filter = "1"){
         $cols = implode(",", $cols);
 
         try{
@@ -65,6 +65,7 @@ class DatabaseConnection{
             $sql= "SELECT $cols FROM $table1 
             $join $table2
             ON $table1.$table1RelationCol = $table2.$table2RelationCol
+            WHERE $filter
             ORDER BY $sortCol $sortDir";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
@@ -76,6 +77,9 @@ class DatabaseConnection{
             return "Failed " . $e->getMessage();
         }
     }
+
+    // SELECT $cols FROM $table1 WHERE $col = $selection
+    // and join and no sort
 
     public function insertAction($table, $cols, $values){
         //paima table, column, value ir ideda i sql
@@ -134,7 +138,7 @@ class DatabaseConnection{
            $dataString[] = $cols[$i] . " = '" . $values[$i]. "'";
         }
         $dataString = implode(",", $dataString);
-     var_dump($dataString);
+        var_dump($dataString);
 
 
        try{

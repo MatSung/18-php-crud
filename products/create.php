@@ -14,7 +14,7 @@ if($parduotuveDatabase->createItem('products')){
         <form method="POST" enctype="multipart/form-data">
             <input class="form-control" name="title" placeholder="Title">
             <input class="form-control" name="description" placeholder="Description">
-            <input class="form-control" name="price" type="number" placeholder="Price">
+            <input class="form-control" name="price" type="number" min="0" step="0.01" placeholder="Price">
             <select class="form-select" name="category_id">
                 <?php
                 var_dump($parduotuveDatabase->getValues('categories', 'id, title'));

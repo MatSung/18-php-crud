@@ -18,7 +18,7 @@ if($parduotuveDatabase->updateItem('products')){
             <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>">
             <input class="form-control" name="title" placeholder="Title" value="<?php echo $item['title'] ?>">
             <input class="form-control" name="description" placeholder="Description" value="<?php echo $item['description'] ?>">
-            <input class="form-control" name="price" type="number" placeholder="Price" value="<?php echo $item['price'] ?>">
+            <input class="form-control" name="price" type="number" min="0" step="0.01" placeholder="Price" value="<?php echo $item['price'] ?>">
             <select class="form-select" name="category_id">
                 <?php
                 foreach ($parduotuveDatabase->getValues('categories', 'id, title') as $categoryItem) { ?>

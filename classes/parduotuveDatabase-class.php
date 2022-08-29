@@ -20,6 +20,8 @@ class parduotuveDatabase extends DatabaseConnection
                 } else {
                     $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC");
                 }
+            } else if(isset($_POST['filter_by_cat']) && $_POST['category_id'] != 0) {
+                $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC", "categories.id = ".$_POST['category_id']);
             } else {
                 $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"]);
             }
@@ -52,7 +54,9 @@ class parduotuveDatabase extends DatabaseConnection
 
         //var_dump($this->parduotuve[0]);
         //if we are in index, print the whole list plus editing functionality
+    }
 
+    public function getItems(){
         if ((isset($_GET["page"]) || isset($_GET["subpage"])) && !isset($_POST["delete"]) && !isset($_POST["update"])) {
             if ($_GET["page"] == "products" && $_GET["subpage"] == "index") {
                 foreach ($this->parduotuve as $item) {
