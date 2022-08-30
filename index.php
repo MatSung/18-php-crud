@@ -66,7 +66,7 @@
             </div>
         </div>
         <div style="text-align: center;" class="container align-middle">
-            <a href="index.php?page=settings">settings</a>
+            <a href="index.php?page=settings&subpage=index">settings</a>
         </div>
     <?php
     }
