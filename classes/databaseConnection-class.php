@@ -138,7 +138,7 @@ class DatabaseConnection{
            $dataString[] = $cols[$i] . " = '" . $values[$i]. "'";
         }
         $dataString = implode(",", $dataString);
-        var_dump($dataString);
+        //var_dump($dataString);
 
 
        try{
@@ -146,7 +146,7 @@ class DatabaseConnection{
               $sql = "UPDATE `$table` SET $dataString WHERE id = $id";
               $stmt = $this->conn->prepare($sql);
               $stmt->execute();
-              echo "Pavyko atnaujinti irasa";
+              //echo "Pavyko atnaujinti irasa";
          } 
        catch(PDOException $e) {
               echo "Failed: " . $e->getMessage();

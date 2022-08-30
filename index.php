@@ -26,59 +26,66 @@
         <header id="header">
             <div class="nav-tables">
                 <div>
-                    <a class="small" 
-                    <?php if ($_GET["page"] == 'products') echo "style='font-weight: bold;'";  ?> href="index.php?page=products&subpage=index">Produktai</a>
+                    <a class="small" <?php if ($_GET["page"] == 'products') echo "style='font-weight: bold;'";  ?> href="index.php?page=products&subpage=index">Produktai</a>
                 </div>
                 <div>
                     <a class="small" <?php if ($_GET["page"] == 'categories') echo "style='font-weight: bold;'";  ?> href="index.php?page=categories&subpage=index">Kategorijos</a>
+                </div>
+                <div>
+                    <a class="small" <?php if ($_GET["page"] == 'settings') echo "style='font-weight: bold;'";  ?> href="index.php?page=settings&subpage=index">Settings</a>
                 </div>
             </div>
             <nav id="nav-bar">
                 <ul>
                     <!-- class="nav-link" -->
                     <?php
-                        if($_GET["page"] == "products")
-                        {
-                            echo '<li ><a class="nav-link" href="index.php?page=products&subpage=index">Index</a></li>';
-                            echo '<li ><a class="nav-link" href="index.php?page=products&subpage=create">Create</a></li>';
-                            //echo '<li ><a class="nav-link" href="index.php?page=products&subpage=edit">Edit</a></li>';
-                        } else if($_GET["page"] == "categories"){
-                            echo '<li ><a class="nav-link" href="index.php?page=categories&subpage=index">Index</a></li>';
-                            echo '<li ><a class="nav-link" href="index.php?page=categories&subpage=create">Create</a></li>';
-                            //echo '<li ><a class="nav-link" href="index.php?page=categories&subpage=edit">Edit</a></li>';
-                        }
+                    if ($_GET["page"] == "products") {
+                        echo '<li ><a class="nav-link" href="index.php?page=products&subpage=index">Index</a></li>';
+                        echo '<li ><a class="nav-link" href="index.php?page=products&subpage=create">Create</a></li>';
+                        //echo '<li ><a class="nav-link" href="index.php?page=products&subpage=edit">Edit</a></li>';
+                    } else if ($_GET["page"] == "categories") {
+                        echo '<li ><a class="nav-link" href="index.php?page=categories&subpage=index">Index</a></li>';
+                        echo '<li ><a class="nav-link" href="index.php?page=categories&subpage=create">Create</a></li>';
+                        //echo '<li ><a class="nav-link" href="index.php?page=categories&subpage=edit">Edit</a></li>';
+                    } else if ($_GET["page"] == "settings") {
+                        echo '<li ><a class="nav-link" href="index.php?page=settings&subpage=index">Index</a></li>';
+                        echo '<li ><a class="nav-link" href="index.php?page=settings&subpage=create">Create</a></li>';
+                    }
                     ?>
                 </ul>
             </nav>
         </header>
     <?php
-    } else {
-        //we are at the beginning so we can show the front page
-        echo '<div class="my-container">
-                <div>
-                    <a class="big" href="index.php?page=products&subpage=index">Produktai</a>
-                </div>
-                <div>
-                    <a class="big" href="index.php?page=categories&subpage=index">Kategorijos</a>
-                </div>
-            </div>';
+    } else { ?>
+        <div class="my-container">
+            <div>
+                <a class="big" href="index.php?page=products&subpage=index">Produktai</a>
+            </div>
+            <div>
+                <a class="big" href="index.php?page=categories&subpage=index">Kategorijos</a>
+            </div>
+        </div>
+        <div style="text-align: center;" class="container align-middle">
+            <a href="index.php?page=settings">settings</a>
+        </div>
+    <?php
     }
     ?>
-    
+
 
     <?php
-        //pagal page ir subpage busime nukreipiami i ten kur reikia
-        // jeigu page set bet subpage not tada nukreipiu tiesiai i index
-        if(isset($_GET["page"])){
-            $page = $_GET["page"];
-            
-            if(isset($_GET["subpage"])){
-                $subpage = ($_GET["subpage"]);
-                include($page."\\".$subpage.".php");
-            }else{
-                include($page."\\index.php");
-            }
+    //pagal page ir subpage busime nukreipiami i ten kur reikia
+    // jeigu page set bet subpage not tada nukreipiu tiesiai i index
+    if (isset($_GET["page"])) {
+        $page = $_GET["page"];
+
+        if (isset($_GET["subpage"])) {
+            $subpage = ($_GET["subpage"]);
+            include($page . "\\" . $subpage . ".php");
+        } else {
+            include($page . "\\index.php");
         }
+    }
     ?>
 
 

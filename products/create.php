@@ -1,9 +1,9 @@
 <?php
 $parduotuveDatabase = new parduotuveDatabase();
 include("upload.php");
-//if($parduotuveDatabase->createItem('products')){
-//    header('Location: index.php?page=products&subpage=index');
-//}
+if($parduotuveDatabase->createItem('products', $target_file)){
+    header('Location: index.php?page=products&subpage=index');
+}
 ?>
 
 <!DOCTYPE html>
@@ -16,9 +16,7 @@ include("upload.php");
             <input class="form-control" name="description" placeholder="Description">
             <input class="form-control" name="price" type="number" min="0" step="0.01" placeholder="Price">
             <select class="form-select" name="category_id">
-                <?php
-                var_dump($parduotuveDatabase->getValues('categories', 'id, title'));
-                ?>
+                
                 <?php
 
                 foreach ($parduotuveDatabase->getValues('categories', 'id, title') as $categoryItem) { ?>

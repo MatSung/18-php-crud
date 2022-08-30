@@ -81,3 +81,7 @@ header{
     display: inline-block !important;
     width: 40px !important;
   }
+
+  .align-middle{
+    text-align: center;
+  }

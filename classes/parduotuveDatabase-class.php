@@ -5,6 +5,7 @@ class parduotuveDatabase extends DatabaseConnection
 {
     public $parduotuve;
     public $categories;
+    public $pageSetting;
 
     public function __construct($table1 = 'products')
     {
@@ -12,84 +13,122 @@ class parduotuveDatabase extends DatabaseConnection
 
         //jeigu norim produktu tada kategorijos yra antrinis table
         //jeigu norim kategoriju tada products yra antrinis table
-        if ($table1 == 'products') {
+        if ($table1 == "settings") {
+            $this->parduotuve = $this->selectAction($table1);
+        } else if ($table1 == 'products') {
             $table2 = 'categories';
-            if (isset($_POST['sort_by_cat'])){
-                if ($_POST['sort_type'] == "asc"){
+            if (isset($_POST['sort_by_cat'])) {
+                if ($_POST['sort_type'] == "asc") {
                     $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category");
                 } else {
                     $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC");
                 }
-            } else if(isset($_POST['filter_by_cat']) && $_POST['category_id'] != 0) {
-                $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC", "categories.id = ".$_POST['category_id']);
+            } else if (isset($_REQUEST['filter_by_cat']) && $_REQUEST['category_id'] != 0) {
+                $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC", "categories.id = " . $_REQUEST['category_id']);
             } else {
                 $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"]);
             }
         } else {
             $table2 = 'products';
-            if (isset($_POST['sort_by_id'])){
-                if ($_POST['sort_type'] == "asc"){
-                    $this->parduotuve = $this->selectAction($table1,"id", 'ASC');
+            if (isset($_POST['sort_by_id'])) {
+                if ($_POST['sort_type'] == "asc") {
+                    $this->parduotuve = $this->selectAction($table1, "id", 'ASC');
                 } else {
-                    $this->parduotuve = $this->selectAction($table1,"id", 'DESC');
+                    $this->parduotuve = $this->selectAction($table1, "id", 'DESC');
                 }
-            } else if(isset($_POST['sort_by_title'])){
-                if ($_POST['sort_type'] == "asc"){
-                    $this->parduotuve = $this->selectAction($table1,"title", 'ASC');
+            } else if (isset($_POST['sort_by_title'])) {
+                if ($_POST['sort_type'] == "asc") {
+                    $this->parduotuve = $this->selectAction($table1, "title", 'ASC');
                 } else {
-                    $this->parduotuve = $this->selectAction($table1,"title", 'DESC');
+                    $this->parduotuve = $this->selectAction($table1, "title", 'DESC');
                 }
-            } else if (isset($_POST['sort_by_desc'])){
-                if ($_POST['sort_type'] == "asc"){
-                    $this->parduotuve = $this->selectAction($table1,"description", 'ASC');
+            } else if (isset($_POST['sort_by_desc'])) {
+                if ($_POST['sort_type'] == "asc") {
+                    $this->parduotuve = $this->selectAction($table1, "description", 'ASC');
                 } else {
-                    $this->parduotuve = $this->selectAction($table1,"description", 'DESC');
+                    $this->parduotuve = $this->selectAction($table1, "description", 'DESC');
                 }
-            }
-             else {
+            } else {
                 $this->parduotuve = $this->selectAction($table1);
             }
-
         }
 
         //var_dump($this->parduotuve[0]);
         //if we are in index, print the whole list plus editing functionality
     }
 
-    public function getItems(){
+    public function getItems($pageNumber = 1, $pageSize = 0)
+    {
         if ((isset($_GET["page"]) || isset($_GET["subpage"])) && !isset($_POST["delete"]) && !isset($_POST["update"])) {
             if ($_GET["page"] == "products" && $_GET["subpage"] == "index") {
-                foreach ($this->parduotuve as $item) {
-                    echo "<tr>";
-                    echo "<td>" . $item["id"] . "</td>";
-                    echo "<td>" . $item["title"] . "</td>";
-                    echo "<td>" . $item["description"] . "</td>";
-                    echo "<td>" . $item["price"] . "</td>";
-                    if (empty($item["category"])) {
-                        echo "<td>Nėra kategorijos</td>";
-                    } else {
-                        echo "<td>" . $item["category"] . "</td>";
+                // if i get page number and size for loop to only print take 
+                // $current_page_size(int) of items after $current_page(int) x $current_page_size
+                if ($pageSize != 0) {
+                    $current_page_item = ($pageNumber == 1) ? 0 : $pageSize * ($pageNumber-1);
+                    $pageLimit =  ($current_page_item + $pageSize > count($this->parduotuve)) ? count($this->parduotuve) : ($current_page_item+$pageSize);
+                    //or item limit whichever is higher
+                    for($i = $current_page_item+1; $i <= $pageLimit; $i++){
+                        echo "<tr>";
+                        echo "<td>" . $this->parduotuve[$i-1]["id"] . "</td>";
+                        echo "<td>" . $this->parduotuve[$i-1]["title"] . "</td>";
+                        echo "<td>" . $this->parduotuve[$i-1]["description"] . "</td>";
+                        echo "<td>" . $this->parduotuve[$i-1]["price"] . "</td>";
+                        if (empty($this->parduotuve[$i-1]["category"])) {
+                            echo "<td>Nėra kategorijos</td>";
+                        } else {
+                            echo "<td>" . $this->parduotuve[$i-1]["category"] . "</td>";
+                        }
+                        if (empty($this->parduotuve[$i-1]["image_url"])) {
+                            echo "<td>NO IMAGE</td>";
+                        } else {
+                            $image_url = str_replace("\\", "/", $this->parduotuve[$i-1]['image_url']);
+                            echo "<td><img height='100' width='100' src='" . $image_url . "'</td>";
+                        }
+                        echo "<td>";
+                        echo "<form method='POST'>";
+                        echo "<input type='hidden' name='id' value='" . $this->parduotuve[$i-1]["id"] . "'>";
+                        //edit and delete
+                        echo "<a href='index.php?page=products&subpage=update&id=" . $this->parduotuve[$i-1]["id"] . "' class='btn btn-primary'>EDIT</a>";
+                        echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
+                        echo "</form>";
+                        //code edit action to go to edit screen (update in sql)
+
+                        echo "</td>";
+                        echo "</tr>";
                     }
-                    // <image href="$item["image_url"]" >
-                    if(empty($item["image_url"])){
-                        echo "<td>NO IMAGE</td>";
-                    } else {
-                        $image_url = str_replace("\\", "/", $item['image_url']);
-                        echo "<td><img height='100' width='100' src='products/". $image_url ."'</td>";
+                } else {
+                    foreach ($this->parduotuve as $item) {
+                        echo "<tr>";
+                        echo "<td>" . $item["id"] . "</td>";
+                        echo "<td>" . $item["title"] . "</td>";
+                        echo "<td>" . $item["description"] . "</td>";
+                        echo "<td>" . $item["price"] . "</td>";
+                        if (empty($item["category"])) {
+                            echo "<td>Nėra kategorijos</td>";
+                        } else {
+                            echo "<td>" . $item["category"] . "</td>";
+                        }
+                        // <image href="$item["image_url"]" >
+                        if (empty($item["image_url"])) {
+                            echo "<td>NO IMAGE</td>";
+                        } else {
+                            $image_url = str_replace("\\", "/", $item['image_url']);
+                            echo "<td><img height='100' width='100' src='" . $image_url . "'</td>";
+                        }
+                        echo "<td>";
+                        echo "<form method='POST'>";
+                        echo "<input type='hidden' name='id' value='" . $item["id"] . "'>";
+                        //edit and delete
+                        echo "<a href='index.php?page=products&subpage=update&id=" . $item["id"] . "' class='btn btn-primary'>EDIT</a>";
+                        echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
+                        echo "</form>";
+                        //code edit action to go to edit screen (update in sql)
+
+                        echo "</td>";
+                        echo "</tr>";
                     }
-                    echo "<td>";
-                    echo "<form method='POST'>";
-                    echo "<input type='hidden' name='id' value='" . $item["id"] . "'>";
-                    //edit and delete
-                    echo "<a href='index.php?page=products&subpage=update&id=" . $item["id"] . "' class='btn btn-primary'>EDIT</a>";
-                    echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
-                    echo "</form>";
-                    //code edit action to go to edit screen (update in sql)
-                    
-                    echo "</td>";
-                    echo "</tr>";
                 }
-            } else if($_GET["page"] == "categories" && $_GET["subpage"] == "index"){
+            } else if ($_GET["page"] == "categories" && $_GET["subpage"] == "index") {
                 foreach ($this->parduotuve as $item) {
                     echo "<tr>";
                     echo "<td>" . $item["id"] . "</td>";
@@ -100,10 +139,24 @@ class parduotuveDatabase extends DatabaseConnection
                     echo "<input type='hidden' name='id' value='" . $item["id"] . "'>";
                     //code delete action
                     echo "<a href='index.php?page=categories&subpage=update&id=" . $item["id"] . "' class='btn btn-primary'>EDIT</a>";
-                    echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";                    
+                    echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
                     echo "</form>";
-                    //code edit action to go to edit screen (update in sql)
-                    //echo "<a href='index.php?page=update&id=" . $movie["id"] . "' class='btn btn-success'>EDIT</a>";
+                    echo "</td>";
+                    echo "</tr>";
+                }
+            } else if ($_GET["page"] == "settings" && $_GET["subpage"] == "index") {
+                foreach ($this->parduotuve as $item) {
+                    echo "<tr>";
+                    echo "<td>" . $item["id"] . "</td>";
+                    echo "<td>" . $item["value"] . "</td>";
+                    echo "<td>" . $item["name"] . "</td>";
+                    echo "<td>";
+                    echo "<form method='POST'>";
+                    echo "<input type='hidden' name='id' value='" . $item["id"] . "'>";
+                    //code delete action
+                    echo "<a href='index.php?page=settings&subpage=update&id=" . $item["id"] . "' class='btn btn-primary'>EDIT</a>";
+                    echo "<button class='btn btn-danger' type='submit' name='delete'>DELETE</button>";
+                    echo "</form>";
                     echo "</td>";
                     echo "</tr>";
                 }
@@ -117,34 +170,43 @@ class parduotuveDatabase extends DatabaseConnection
         //select with join bus cia kad parodytu database
     }
 
-    public function deleteItem($table){
-        if(isset($_POST["delete"])){
+    public function deleteItem($table)
+    {
+        if (isset($_POST["delete"])) {
             $this->deleteAction($table, $_POST["id"]);
-            header("Location: index.php?page=".$table."&subpage=index");
+            header("Location: index.php?page=" . $table . "&subpage=index");
         }
     }
 
-    public function createItem($table){
-        if(isset($_POST['submit'])){
+    public function createItem($table, $img_url = "")
+    {
+        if (isset($_POST['submit'])) {
             //set all text entries
-            
+
             //skip id, title, description, price float, category_id provided, image_url
             $cols = ["title", "description"];
             $items = [
                 '"' . $_POST['title'] . '"',
-                '"' . $_POST['description']. '"'
+                '"' . $_POST['description'] . '"'
             ];
-            if($table == "products")
-            {
+            if ($table == "products") {
                 array_push($cols, "price", "category_id", "image_url");
                 array_push($items, '"' . $_POST['price'] . '"', $_POST['category_id']);
                 //image url
-                //array_push($items, '"files/SkateDog.png"');
+                echo $img_url;
+                array_push($items, '"' . $img_url . '"');
+            }
+            if ($table == "settings") {
+                $cols = ["value", "name"];
+                $items = [
+                    '"' . $_POST['value'] . '"',
+                    '"' . $_POST['name'] . '"'
+                ];
             }
             // $table = products\
             // $cols = [`title`, `description`, `price`, `category_id`, `image_url`]
             // $values = [title, description, 1.0, 1, "uploads/image.png"]
-            if($this->insertAction($table, $cols, $items)){
+            if ($this->insertAction($table, $cols, $items)) {
                 return 1;
             }
         }
@@ -152,32 +214,44 @@ class parduotuveDatabase extends DatabaseConnection
     }
 
 
-    public function getValues($table, $col){
+    public function getValues($table, $col)
+    {
         $this->categories = $this->selectByColAction($table, $col);
         return $this->categories;
     }
 
-    public function selectOneItem($table) {
-        if(($_GET["subpage"] == "update" && isset($_GET["id"]))) {
+    public function selectOneItem($table)
+    {
+        if (($_GET["subpage"] == "update" && isset($_GET["id"]))) {
             $item = $this->selectOneAction($table, $_GET["id"]);
             return $item[0];
-            
         }
     }
 
-    public function updateItem($table) {
-        if(isset($_POST["update"])) {
-            $data = array(
-                'title' => $_POST['title'],
-                'description' => $_POST['description']
-            );
-            if($table == 'products'){
-                $data['price'] = $_POST['price'];
-                $data['category_id'] = $_POST['category_id'];
+    public function updateItem($table)
+    {
+        if (isset($_POST["update"])) {
+            if($table != 'settings'){
+                $data = array(
+                    'title' => $_POST['title'],
+                    'description' => $_POST['description']
+                );
+                if ($table == 'products') {
+                    $data['price'] = $_POST['price'];
+                    $data['category_id'] = $_POST['category_id'];
+                }
+    
+                $this->updateAction($table, $_POST["id"], $data);
+                return 1;
+            } else {
+                $data = array(
+                    'value' => $_POST['value'],
+                    'name' => $_POST['name']
+                );
+                $this->updateAction($table, $_POST["id"], $data);
+                return 1;
             }
-
-            $this->updateAction($table, $_POST["id"] , $data);
-            return 1;
+            
         }
         return 0;
     }
