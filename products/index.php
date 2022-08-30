@@ -4,7 +4,6 @@
     //if page number is not set or 0
     
     if (isset($_GET['page-number']) && $_GET['page-size'] != 0) {
-        // for (amount-of-items) / (page size) make button with corresponding number
         $current_page = $_GET['page-number'];
         //echo " ";
         $current_page_size = $_GET['page-size'];
@@ -15,16 +14,15 @@
         $current_page = 1;
         $current_page_size = 0;
     }
-    if(isset($_POST["filter_by_cat"]) && $_POST["category_id"] != 0){
+    if(isset($_POST["filter_by_cat"])){
         $current_filter = $_POST["category_id"];
-        $filter_enabled = 1;
         $current_page = 1;
     }else if (isset($_GET["filter_by_cat"]) && $_GET["category_id"] > 0){
         $current_filter = $_GET["category_id"];
         $filter_enabled = 1;
     }
      else {
-        $filter_enabled = 0;
+        unset($_GET['category_id']);
         $current_filter = 0;
     }
 
@@ -111,9 +109,7 @@
             <th>Actions</th>
         </tr>
         <?php
-        //take $current_page_size(int) of items after $current_page(int) x $current_page_size
         if (isset($_GET['page-number']) && $_GET['page-size'] != 0) {
-            //fix filter by category to work with pages
             $productsDatabase->getItems($current_page, $current_page_size);
         } else {
             $productsDatabase->getItems();
