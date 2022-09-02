@@ -7,7 +7,7 @@ class parduotuveDatabase extends DatabaseConnection
     public $categories;
     public $pageSetting;
 
-    public function __construct($table1 = 'products')
+    public function __construct($table1 = 'products', $settings = "")
     {
         parent::__construct();
 
@@ -17,17 +17,19 @@ class parduotuveDatabase extends DatabaseConnection
             $this->parduotuve = $this->selectAction($table1);
         } else if ($table1 == 'products') {
             $table2 = 'categories';
-            if (isset($_POST['sort_by_cat'])) {
-                if ($_POST['sort_type'] == "asc") {
-                    $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category");
-                } else {
-                    $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC");
-                }
-            } else if (isset($_REQUEST['filter_by_cat']) && $_REQUEST['category_id'] != 0) {
-                $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], "category", "DESC", "categories.id = " . $_REQUEST['category_id']);
-            } else {
-                $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"]);
+            //if filter id is 0, then default, else not default
+            $filter = 1;
+            //echo "I have not filetered yet but the criteria is  ".$settings["search_criteria"];
+            
+            if(isset($settings["search_criteria"]) && $settings["category_id"] > 0){
+                $filter = "products.title LIKE " . "'%" . $settings["search_criteria"] . "%'". " AND " . "categories.id = " . $settings["category_id"];
+            } else if (isset($settings["search_criteria"])){
+                $filter = "products.title LIKE "."'%".$settings["search_criteria"]."%'";
+                //echo "i have filetered because i have search criteria ".$settings["search_criteria"];
+            } else if ($settings["category_id"] > 0){
+                $filter = "categories.id = " . $settings["category_id"];
             }
+            $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"], $settings["sort_col"], $settings["sort_type"], $filter);
         } else {
             $table2 = 'products';
             if (isset($_POST['sort_by_id'])) {
