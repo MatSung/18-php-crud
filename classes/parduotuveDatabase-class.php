@@ -7,7 +7,7 @@ class parduotuveDatabase extends DatabaseConnection
     public $categories;
     public $pageSetting;
 
-    public function __construct($table1 = 'products', $settings = "")
+    public function __construct($table1 = 'products', $settings = [])
     {
         parent::__construct();
 
@@ -20,7 +20,10 @@ class parduotuveDatabase extends DatabaseConnection
             //if filter id is 0, then default, else not default
             $filter = 1;
             //echo "I have not filetered yet but the criteria is  ".$settings["search_criteria"];
-            
+            if($settings == []){
+                $this->parduotuve = $this->selectJoinAction($table1, $table2, 'category_id', 'id', "LEFT JOIN", ["products.id", "products.title", "products.description", "products.price", "categories.title as category", "products.image_url"]);
+                return 1;
+            }
             if(isset($settings["search_criteria"]) && $settings["category_id"] > 0){
                 $filter = "products.title LIKE " . "'%" . $settings["search_criteria"] . "%'". " AND " . "categories.id = " . $settings["category_id"];
             } else if (isset($settings["search_criteria"])){
@@ -115,7 +118,7 @@ class parduotuveDatabase extends DatabaseConnection
                             echo "<td>NO IMAGE</td>";
                         } else {
                             $image_url = str_replace("\\", "/", $item['image_url']);
-                            echo "<td><img height='100' width='100' src='" . $image_url . "'</td>";
+                            echo "<td><img alt='INVALID IMG URL' height='100' width='100' src='" . $image_url . "'</td>";
                         }
                         echo "<td>";
                         echo "<form method='POST'>";
