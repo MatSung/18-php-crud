@@ -20,7 +20,7 @@ class DatabaseConnection{
     }
 
     //pick a table and select all from it
-    public function selectAction($table,$sortCol="id", $sortDir="ASC", $filter = "1"){
+    public function selectAction($table, $sortCol="id", $sortDir="ASC", $filter = "1"){
         try {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $sql = "SELECT * FROM `$table` WHERE $filter ORDER BY $sortCol $sortDir";
@@ -34,10 +34,10 @@ class DatabaseConnection{
         }
     }
 
-    public function selectByColAction($table, $col){
+    public function selectByColAction($table, $col, $filter = 1){
         try {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "SELECT $col FROM `$table` WHERE 1";
+            $sql = "SELECT $col FROM `$table` WHERE $filter";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute();
             $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
